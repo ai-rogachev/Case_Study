@@ -1,60 +1,18 @@
 cmake_minimum_required(VERSION 3.8)
-project(Main VERSION 0.1.0 LANGUAGES C CXX)
+project(StaticLibTest VERSION 0.1.0 LANGUAGES C CXX)
 
-set(CMAKE_C_STANDARD 99)
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(This StaticLibTest)
 
-get_directory_property(ParentDirectory PARENT_DIRECTORY)
-if(ParentDirectory STREQUAL "")
-    # Define option for linking with the runtime statically.
-    if(MSVC)
-        option(RUNTIME_STATIC_LINKAGE "Link with runtime library statically" OFF)
-    endif(MSVC)
+set(Sources
+    main.cpp
+)
 
-    # If the runtime static linkage option is turned on, replace
-    # compiler flag that selects runtime library variant.
-    if(MSVC AND RUNTIME_STATIC_LINKAGE)
-        foreach(flag
-            CMAKE_C_FLAGS
-            CMAKE_CXX_FLAGS
-            CMAKE_C_FLAGS_DEBUG
-            CMAKE_CXX_FLAGS_DEBUG
-            CMAKE_C_FLAGS_RELEASE
-            CMAKE_CXX_FLAGS_RELEASE
-            CMAKE_C_FLAGS_MINSIZEREL
-            CMAKE_CXX_FLAGS_MINSIZEREL
-            CMAKE_C_FLAGS_RELWITHDEBINFO
-            CMAKE_CXX_FLAGS_RELWITHDEBINFO
-        )
-            if(${flag} MATCHES "/MD")
-                string(REGEX REPLACE "/MD" "/MT" ${flag} "${${flag}}")
-            endif(${flag} MATCHES "/MD")
-        endforeach(flag)
-    endif(MSVC AND RUNTIME_STATIC_LINKAGE)
+add_executable(${This} ${Sources})
+set_target_properties(${This} PROPERTIES
+    FOLDER Applications
+)
 
-    # Organize applications, libraries, etc. in folders in the IDE.
-    set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+target_include_directories(${This} PUBLIC include)
+target_link_libraries(${This} lib)
 
-    # Ensure proper loading of side-loaded shared libraries
-    # on all targets.
-    set(CMAKE_SKIP_BUILD_RPATH FALSE)
-    if(APPLE)
-        set(CMAKE_BUILD_WITH_INSTALL_NAME_DIR TRUE)
-        set(CMAKE_INSTALL_NAME_DIR "@loader_path")
-    elseif(UNIX)
-        set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
-        set(CMAKE_INSTALL_RPATH "\$ORIGIN")
-    endif()
-
-    # Don't add the goofy "d" postfix for debug builds of libraries.
-    set(CMAKE_DEBUG_POSTFIX "")
-
-    # Suppress Microsoft warnings about functions being unsafe.
-    add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS)
-endif(ParentDirectory STREQUAL "")
-
-# Add subdirectories directly in this repository.
 add_subdirectory(lib)
-
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})

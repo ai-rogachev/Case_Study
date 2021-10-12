@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.8)
-project(DynamicLibTest VERSION 0.1.0 LANGUAGES C CXX)
+project(PlugInTest VERSION 0.1.0 LANGUAGES C CXX)
 
-set(This DynamicLibTest)
+set(This PlugInTest)
 
 set(Sources
     main.cpp
