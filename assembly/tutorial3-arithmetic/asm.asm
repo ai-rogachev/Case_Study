@@ -18,6 +18,7 @@
 .code
 AsmAddInt proc
 	; add [reg/mem], [reg, mem, inm]
+	add rcx, 5
 	add rcx, rdx
 	mov rax, rcx
 	ret

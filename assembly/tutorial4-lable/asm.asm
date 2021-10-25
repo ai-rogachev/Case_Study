@@ -7,6 +7,9 @@ MainLoop:
 	dec ecx
 	jnz MainLoop ; zero flag will set to 1
 
+	lea rax, MainLoop  ; load to rax - address label MainLoop
+	lea rdx, [ecx + 1] ; load to rdx - calc address [ecx + 1]
+	
 	ret
 LoopTest endp
 
