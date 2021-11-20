@@ -1,7 +1,18 @@
 #include <iostream>
 
+// for test
+// https://crc32.online/
+
+/*  
+	Width  : 32
+	Poly   : 0x04c11db7
+	Init   : parameter, typically 0xffffffff
+	RefIn  : false
+	RefOut : false
+	XorOut : 0
+*/
+
 extern "C" size_t _cdecl CalcCrc32(char* msg, size_t len);
-//extern "C" size_t _cdecl CalcCrc32(int msg, int len);
 
 int main()
 {
