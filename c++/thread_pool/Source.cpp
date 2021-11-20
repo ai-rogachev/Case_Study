@@ -8,10 +8,14 @@
 	Test5 - elapsed time is 9.8361 ms
 */
 
-#include "thread_pool.h"
 #include <cassert>
 #include <iostream>
 #include <chrono>
+#include <thread>
+
+
+#include "priority.h"
+#include "thread_pool.h"
 
 const size_t NUMBER = 1'000'000;
 
@@ -125,7 +129,7 @@ void Test5()
 	assert(summ, NUMBER);
 }
 
-int main()
+void TestThreadPool()
 {
 	// harm from concurrency
 	std::cout << "-- bad concurrency idea;" << std::endl;
@@ -136,6 +140,46 @@ int main()
 	std::cout << "-- good concurrency idea;" << std::endl;
 	Test4();
 	Test5();
+}
+
+void TestPriorityExecutor()
+{
+	auto pool = concur::MakeStaticPool(4);
+	auto prior = concur::MakePriorityExecutor(pool);
+
+	prior->Execute(100, 
+		[]() {
+			std::cout << "Task priority = 100 / id = " << 
+				std::this_thread::get_id() << std::endl;
+			std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		}
+	);
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+	prior->Execute(0,
+		[]() {
+			std::cout << "Task priority = 0 / id = " <<
+				std::this_thread::get_id() << std::endl;
+			std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		}
+	);
+
+	prior->Execute(200,
+		[]() {
+			std::cout << "Task priority = 200 / id = " <<
+				std::this_thread::get_id() << std::endl;
+			std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		}
+	);
+
+	pool->Join();
+}
+
+int main()
+{
+	//TestThreadPool();
+	TestPriorityExecutor();
 
 	std::cin.get();
 	return 0;

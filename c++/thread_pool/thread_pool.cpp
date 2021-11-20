@@ -18,7 +18,14 @@ StaticThreadPool::StaticThreadPool(size_t workers)
 
 StaticThreadPool::~StaticThreadPool()
 {
+    if (!workers_.empty())
+        Shutdown();
     assert(workers_.empty());
+}
+
+void StaticThreadPool::Execute(Task&& task)
+{
+    Submit(task);
 }
 
 void StaticThreadPool::Submit(Task task)
@@ -91,6 +98,11 @@ void StaticThreadPool::WorkerRoutine(StaticThreadPool* main_pool)
 
 StaticThreadPool* StaticThreadPool::Current() {
     return pool;
+}
+
+IThreadPoolPtr MakeStaticPool(int threads_num)
+{
+    return std::make_shared<StaticThreadPool>(threads_num);
 }
 
 } // concur

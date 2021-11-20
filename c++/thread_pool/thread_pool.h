@@ -3,20 +3,21 @@
 #include <vector>
 #include <atomic>
 #include <mutex>
-#include <functional>
 
+#include "ithread_pool.h"
 #include "blocking_queue.h"
+#include "executor.h"
 
 namespace concur
 {
 
-using Task = std::function<void()>;
-
-class StaticThreadPool
+class StaticThreadPool : public IThreadPool
 {
 public:
     explicit StaticThreadPool(size_t workers);
     ~StaticThreadPool();
+
+    void Execute(Task&& task);
 
     // no-copyable
     StaticThreadPool(const StaticThreadPool&) = delete;
@@ -49,5 +50,7 @@ private:
 inline StaticThreadPool* Current() {
     return StaticThreadPool::Current();
 }
+
+IThreadPoolPtr MakeStaticPool(int threads_num);
 
 } // concur
